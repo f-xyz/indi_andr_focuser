@@ -6,7 +6,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/build/indiserver/indiserver",
-      "args": ["-v", "${workspaceFolder}/build/indi_mycustomdriver"],
+      "args": ["-v", "${workspaceFolder}/build/indi_andr_focuser"],
       "postDebugTask": "Kill indiserver",
       "stopAtEntry": false,
       "cwd": "${fileDirname}",

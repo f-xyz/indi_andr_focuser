@@ -3,7 +3,7 @@
 #include "libindi/indicom.h"
 
 #include "config.h"
-#include "indi_mycustomdriver.h"
+#include "indi_andr_focuser.h"
 
 // int main() {
 //     printf("Hello\n");
@@ -11,9 +11,9 @@
 // }
 
 // We declare an auto pointer to DummyFocuser.
-static std::unique_ptr<MyFocuser> mydriver(new MyFocuser());
+static std::unique_ptr<AndrFocuser> mydriver(new AndrFocuser());
 
-MyFocuser::MyFocuser()
+AndrFocuser::AndrFocuser()
 {
     setVersion(CDRIVER_VERSION_MAJOR, CDRIVER_VERSION_MINOR);
 
@@ -21,15 +21,18 @@ MyFocuser::MyFocuser()
     setSupportedConnections(CONNECTION_SERIAL | CONNECTION_TCP);
 
     // And here we tell the base class about our focuser's capabilities.
-    SetCapability(FOCUSER_CAN_ABS_MOVE | FOCUSER_CAN_REL_MOVE | FOCUSER_CAN_ABORT);
+    // Values: FOCUSER_CAN_ABS_MOVE | FOCUSER_CAN_REL_MOVE | FOCUSER_CAN_ABORT
+    SetCapability(FOCUSER_CAN_REL_MOVE | FOCUSER_CAN_ABORT);
+
+    // setSupportedConnections()
 }
 
-const char *MyFocuser::getDefaultName()
+const char *AndrFocuser::getDefaultName()
 {
-    return "Dummy Focuser";
+    return "Andr Focuser";
 }
 
-bool MyFocuser::initProperties()
+bool AndrFocuser::initProperties()
 {
     // initialize the parent's properties first
     INDI::Focuser::initProperties();
@@ -41,14 +44,14 @@ bool MyFocuser::initProperties()
     return true;
 }
 
-void MyFocuser::ISGetProperties(const char *dev)
+void AndrFocuser::ISGetProperties(const char *dev)
 {
     INDI::Focuser::ISGetProperties(dev);
 
     // TODO: Call define* for any custom properties.
 }
 
-bool MyFocuser::updateProperties()
+bool AndrFocuser::updateProperties()
 {
     INDI::Focuser::updateProperties();
 
@@ -64,7 +67,7 @@ bool MyFocuser::updateProperties()
     return true;
 }
 
-bool MyFocuser::ISNewNumber(const char *dev, const char *name, double values[], char *names[], int n)
+bool AndrFocuser::ISNewNumber(const char *dev, const char *name, double values[], char *names[], int n)
 {
     // Make sure it is for us.
     if (dev != nullptr && strcmp(dev, getDeviceName()) == 0)
@@ -76,7 +79,7 @@ bool MyFocuser::ISNewNumber(const char *dev, const char *name, double values[], 
     return INDI::Focuser::ISNewNumber(dev, name, values, names, n);
 }
 
-bool MyFocuser::ISNewSwitch(const char *dev, const char *name, ISState *states, char *names[], int n)
+bool AndrFocuser::ISNewSwitch(const char *dev, const char *name, ISState *states, char *names[], int n)
 {
     // Make sure it is for us.
     if (dev != nullptr && strcmp(dev, getDeviceName()) == 0)
@@ -88,7 +91,7 @@ bool MyFocuser::ISNewSwitch(const char *dev, const char *name, ISState *states, 
     return INDI::Focuser::ISNewSwitch(dev, name, states, names, n);
 }
 
-bool MyFocuser::ISNewText(const char *dev, const char *name, char *texts[], char *names[], int n)
+bool AndrFocuser::ISNewText(const char *dev, const char *name, char *texts[], char *names[], int n)
 {
     // Make sure it is for us.
     if (dev != nullptr && strcmp(dev, getDeviceName()) == 0)
@@ -100,14 +103,14 @@ bool MyFocuser::ISNewText(const char *dev, const char *name, char *texts[], char
     return INDI::Focuser::ISNewText(dev, name, texts, names, n);
 }
 
-bool MyFocuser::ISSnoopDevice(XMLEle *root)
+bool AndrFocuser::ISSnoopDevice(XMLEle *root)
 {
     // TODO: Check to see if this is for any of my custom Snoops. Fo shizzle.
 
     return INDI::Focuser::ISSnoopDevice(root);
 }
 
-bool MyFocuser::saveConfigItems(FILE *fp)
+bool AndrFocuser::saveConfigItems(FILE *fp)
 {
     INDI::Focuser::saveConfigItems(fp);
 
@@ -116,7 +119,7 @@ bool MyFocuser::saveConfigItems(FILE *fp)
     return true;
 }
 
-bool MyFocuser::Handshake()
+bool AndrFocuser::Handshake()
 {
     if (isSimulation())
     {
@@ -132,7 +135,7 @@ bool MyFocuser::Handshake()
     return true;
 }
 
-void MyFocuser::TimerHit()
+void AndrFocuser::TimerHit()
 {
     if (!isConnected())
         return;
@@ -140,14 +143,14 @@ void MyFocuser::TimerHit()
     // TODO: Poll your device if necessary. Otherwise delete this method and it's
     // declaration in the header file.
 
-    LOG_INFO("timer hit");
+    // LOG_INFO("timer hit");
 
     // If you don't call SetTimer, we'll never get called again, until we disconnect
     // and reconnect.
     SetTimer(POLLMS);
 }
 
-IPState MyFocuser::MoveFocuser(FocusDirection dir, int speed, uint16_t duration)
+IPState AndrFocuser::MoveFocuser(FocusDirection dir, int speed, uint16_t duration)
 {
     // NOTE: This is needed if we don't specify FOCUSER_CAN_ABS_MOVE
     // TODO: Actual code to move the focuser. You can use IEAddTimer to do a
@@ -156,7 +159,7 @@ IPState MyFocuser::MoveFocuser(FocusDirection dir, int speed, uint16_t duration)
     return IPS_OK;
 }
 
-IPState MyFocuser::MoveAbsFocuser(uint32_t targetTicks)
+IPState AndrFocuser::MoveAbsFocuser(uint32_t targetTicks)
 {
     // NOTE: This is needed if we do specify FOCUSER_CAN_ABS_MOVE
     // TODO: Actual code to move the focuser.
@@ -164,7 +167,7 @@ IPState MyFocuser::MoveAbsFocuser(uint32_t targetTicks)
     return IPS_OK;
 }
 
-IPState MyFocuser::MoveRelFocuser(FocusDirection dir, uint32_t ticks)
+IPState AndrFocuser::MoveRelFocuser(FocusDirection dir, uint32_t ticks)
 {
     // NOTE: This is needed if we do specify FOCUSER_CAN_REL_MOVE
     // TODO: Actual code to move the focuser.
@@ -172,7 +175,7 @@ IPState MyFocuser::MoveRelFocuser(FocusDirection dir, uint32_t ticks)
     return IPS_OK;
 }
 
-bool MyFocuser::AbortFocuser()
+bool AndrFocuser::AbortFocuser()
 {
     // NOTE: This is needed if we do specify FOCUSER_CAN_ABORT
     // TODO: Actual code to stop the focuser.

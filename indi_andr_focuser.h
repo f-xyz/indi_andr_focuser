@@ -2,11 +2,11 @@
 
 #include "libindi/indifocuser.h"
 
-class MyFocuser : public INDI::Focuser
+class AndrFocuser : public INDI::Focuser
 {
 public:
-    MyFocuser();
-    virtual ~MyFocuser() = default;
+    AndrFocuser();
+    virtual ~AndrFocuser() = default;
 
     virtual const char *getDefaultName() override;
 
@@ -30,4 +30,7 @@ protected:
     virtual IPState MoveAbsFocuser(uint32_t targetTicks);
     virtual IPState MoveRelFocuser(FocusDirection dir, uint32_t ticks);
     virtual bool AbortFocuser();
+
+    // INDI::PropertySwitch PowerSP {2};
+    // INDI::PropertyNumber ValueNP {1};
 };

@@ -1,6 +1,6 @@
 # define the project name
 cmake_minimum_required(VERSION 3.28)
-project(indi-mycustomdriver C CXX)
+project(indi-andr-focuser C CXX)
 
 include(GNUInstallDirs)
 
@@ -14,8 +14,8 @@ find_package(ZLIB REQUIRED)
 find_package(GSL REQUIRED)
 
 # these will be used to set the version number in config.h and our driver's xml file
-set(CDRIVER_VERSION_MAJOR 1)
-set(CDRIVER_VERSION_MINOR 2)
+set(CDRIVER_VERSION_MAJOR 0)
+set(CDRIVER_VERSION_MINOR 1)
 
 # do the replacement in the config.h
 configure_file(
@@ -25,8 +25,8 @@ configure_file(
 
 # do the replacement in the driver's xml file
 configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/indi_mycustomdriver.xml.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/indi_mycustomdriver.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/indi_andr_focuser.xml.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/indi_andr_focuser.xml
 )
 
 # set our include directories to look for header files
@@ -40,24 +40,24 @@ include(CMakeCommon)
 
 # tell cmake to build our executable
 add_executable(
-    indi_mycustomdriver
-    indi_mycustomdriver.cpp
+    indi_andr_focuser
+    indi_andr_focuser.cpp
 )
 
 # and link it to these libraries
 target_link_libraries(
-    indi_mycustomdriver
+    indi_andr_focuser
     ${INDI_LIBRARIES}
     ${NOVA_LIBRARIES}
     ${GSL_LIBRARIES}
 )
 
 # tell cmake where to install our executable
-install(TARGETS indi_mycustomdriver RUNTIME DESTINATION bin)
+install(TARGETS indi_andr_focuser RUNTIME DESTINATION bin)
 
 # and where to put the driver's xml file.
 install(
     FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/indi_mycustomdriver.xml
+    ${CMAKE_CURRENT_BINARY_DIR}/indi_andr_focuser.xml
     DESTINATION ${INDI_DATA_DIR}
 )
