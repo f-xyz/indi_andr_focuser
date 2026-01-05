@@ -1,6 +1,7 @@
 #pragma once
 
 #include "libindi/indifocuser.h"
+#include "libindi/connectionplugins/connectiontcp.h"
 
 class AndrFocuser : public INDI::Focuser
 {
@@ -31,6 +32,7 @@ protected:
     virtual IPState MoveRelFocuser(FocusDirection dir, uint32_t ticks);
     virtual bool AbortFocuser();
 
+    Connection::TCP *tcpConnection = nullptr;
     // INDI::PropertySwitch PowerSP {2};
     // INDI::PropertyNumber ValueNP {1};
 };

@@ -6,6 +6,8 @@ sudo add-apt-repository ppa:mutlaqja/ppa
 sudo apt install libindi-dev libnova-dev libz-dev libgsl-dev
 ```
 
+<https://docs.indilib.org/drivers/basics/project-setup.html>
+
 # Building
 
 ```sh

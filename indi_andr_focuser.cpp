@@ -1,7 +1,6 @@
 #include <cstring>
-
 #include "libindi/indicom.h"
-
+#include "libindi/connectionplugins/connectiontcp.h"
 #include "config.h"
 #include "indi_andr_focuser.h"
 
@@ -18,13 +17,18 @@ AndrFocuser::AndrFocuser()
     setVersion(CDRIVER_VERSION_MAJOR, CDRIVER_VERSION_MINOR);
 
     // Here we tell the base Focuser class what types of connections we can support
-    setSupportedConnections(CONNECTION_SERIAL | CONNECTION_TCP);
+    setSupportedConnections(CONNECTION_TCP);
 
     // And here we tell the base class about our focuser's capabilities.
     // Values: FOCUSER_CAN_ABS_MOVE | FOCUSER_CAN_REL_MOVE | FOCUSER_CAN_ABORT
     SetCapability(FOCUSER_CAN_REL_MOVE | FOCUSER_CAN_ABORT);
 
-    // setSupportedConnections()
+    tcpConnection = new Connection::TCP(this);
+    tcpConnection->setDefaultHost("127.0.0.1");
+    tcpConnection->setDefaultPort(12345);
+    tcpConnection->registerHandshake([&]() { return Handshake(); });
+
+    registerConnection(tcpConnection);
 }
 
 const char *AndrFocuser::getDefaultName()
@@ -131,6 +135,9 @@ bool AndrFocuser::Handshake()
 
     // TODO: Any initial communciation needed with our focuser, we have an active
     // connection.
+
+    LOGF_INFO("Connected successfuly to %s.", getDeviceName());
+    LOGF_INFO("Port FD: %d", this->PortFD);
 
     return true;
 }
