@@ -24,7 +24,6 @@ public:
 
 protected:
     virtual bool saveConfigItems(FILE *fp) override;
-
     virtual bool Handshake() override;
 
     virtual IPState MoveFocuser(FocusDirection dir, int speed, uint16_t duration);
@@ -32,7 +31,11 @@ protected:
     virtual IPState MoveRelFocuser(FocusDirection dir, uint32_t ticks);
     virtual bool AbortFocuser();
 
+    // Connection
     Connection::TCP *tcpConnection = nullptr;
+    bool SendCommand(const char *cmd, char *res, int reslen);
+    
+    // Properties
     // INDI::PropertySwitch PowerSP {2};
     // INDI::PropertyNumber ValueNP {1};
 };

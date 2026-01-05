@@ -4,11 +4,6 @@
 #include "config.h"
 #include "indi_andr_focuser.h"
 
-// int main() {
-//     printf("Hello\n");
-//     return 0;
-// }
-
 // We declare an auto pointer to DummyFocuser.
 static std::unique_ptr<AndrFocuser> mydriver(new AndrFocuser());
 
@@ -16,17 +11,18 @@ AndrFocuser::AndrFocuser()
 {
     setVersion(CDRIVER_VERSION_MAJOR, CDRIVER_VERSION_MINOR);
 
-    // Here we tell the base Focuser class what types of connections we can support
-    setSupportedConnections(CONNECTION_TCP);
-
     // And here we tell the base class about our focuser's capabilities.
     // Values: FOCUSER_CAN_ABS_MOVE | FOCUSER_CAN_REL_MOVE | FOCUSER_CAN_ABORT
     SetCapability(FOCUSER_CAN_REL_MOVE | FOCUSER_CAN_ABORT);
 
+    // Set connection up
+    setSupportedConnections(CONNECTION_TCP);
+    
     tcpConnection = new Connection::TCP(this);
     tcpConnection->setDefaultHost("127.0.0.1");
     tcpConnection->setDefaultPort(12345);
     tcpConnection->registerHandshake([&]() { return Handshake(); });
+    tcpConnection->Connect();
 
     registerConnection(tcpConnection);
 }
@@ -137,7 +133,8 @@ bool AndrFocuser::Handshake()
     // connection.
 
     LOGF_INFO("Connected successfuly to %s.", getDeviceName());
-    LOGF_INFO("Port FD: %d", this->PortFD);
+    LOGF_INFO("Port this.FD: %d", this->PortFD);
+    LOGF_INFO("Port tcpConnection.FD: %d", tcpConnection->getPortFD());
 
     return true;
 }
@@ -179,7 +176,18 @@ IPState AndrFocuser::MoveRelFocuser(FocusDirection dir, uint32_t ticks)
     // NOTE: This is needed if we do specify FOCUSER_CAN_REL_MOVE
     // TODO: Actual code to move the focuser.
     LOGF_INFO("MoveRelFocuser: %d %d", dir, ticks);
-    return IPS_OK;
+
+    char q[32];
+    bool result = SendCommand("A test command..", q, sizeof(q));
+
+    if (result)
+    {
+        return IPS_OK;
+    }
+    else
+    {
+        return IPS_ALERT;
+    }
 }
 
 bool AndrFocuser::AbortFocuser()
@@ -187,5 +195,36 @@ bool AndrFocuser::AbortFocuser()
     // NOTE: This is needed if we do specify FOCUSER_CAN_ABORT
     // TODO: Actual code to stop the focuser.
     LOG_INFO("AbortFocuser");
+    return true;
+}
+
+bool AndrFocuser::SendCommand(const char *cmd, char *res, int reslen)
+{
+    int fd = tcpConnection->getPortFD();
+    if (fd < 0)
+    {
+        LOG_ERROR("TCP socket not open");
+        return false;
+    }
+
+    // Write and read operations are identical to serial
+    int nBytesWritten = write(fd, cmd, strlen(cmd));
+    if (nBytesWritten < 0)
+    {
+        LOGF_ERROR("Write error: %s", strerror(errno));
+        return false;
+    }
+
+    if (res && reslen > 0)
+    {
+        int nBytesRead = read(fd, res, reslen - 1);
+        if (nBytesRead < 0)
+        {
+            LOGF_ERROR("Read error: %s", strerror(errno));
+            return false;
+        }
+        res[nBytesRead] = '\0';
+    }
+
     return true;
 }
