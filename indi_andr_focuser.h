@@ -32,8 +32,9 @@ protected:
     virtual bool AbortFocuser();
 
     // Connection
-    Connection::TCP *tcpConnection = nullptr;
-    bool SendCommand(const char *cmd, char *res, int reslen);
+    // Connection::TCP *tcpConnection = nullptr;
+    // int PortFD {-1};
+    bool SendCommand(const char *request, char *response, int responseLen);
     
     // Properties
     // INDI::PropertySwitch PowerSP {2};

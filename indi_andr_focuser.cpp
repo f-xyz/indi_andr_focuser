@@ -4,8 +4,8 @@
 #include "config.h"
 #include "indi_andr_focuser.h"
 
-// We declare an auto pointer to DummyFocuser.
-static std::unique_ptr<AndrFocuser> mydriver(new AndrFocuser());
+// We declare an auto pointer to AndrFocuser.
+static std::unique_ptr<AndrFocuser> andrFocuser(new AndrFocuser());
 
 AndrFocuser::AndrFocuser()
 {
@@ -13,7 +13,7 @@ AndrFocuser::AndrFocuser()
 
     // And here we tell the base class about our focuser's capabilities.
     // Values: FOCUSER_CAN_ABS_MOVE | FOCUSER_CAN_REL_MOVE | FOCUSER_CAN_ABORT
-    SetCapability(FOCUSER_CAN_REL_MOVE | FOCUSER_CAN_ABORT);
+    SetCapability(FOCUSER_CAN_REL_MOVE);
 
     // Set connection up
     setSupportedConnections(CONNECTION_TCP);
@@ -132,9 +132,29 @@ bool AndrFocuser::Handshake()
     // TODO: Any initial communciation needed with our focuser, we have an active
     // connection.
 
-    LOGF_INFO("Connected successfuly to %s.", getDeviceName());
+    LOG_INFO("Handshake with AndrFocuser server...");
+    
     LOGF_INFO("Port this.FD: %d", this->PortFD);
     LOGF_INFO("Port tcpConnection.FD: %d", tcpConnection->getPortFD());
+    
+    // PortFD = tcpConnection->getPortFD();
+    // if (PortFD == -1)
+    // {
+    //     LOG_ERROR("Invalid port file descriptor during handshake.");
+    //     return false;
+    // }
+    
+    // LOGF_INFO("Connected successfuly to %s.", getDeviceName());
+    
+    // Check if socket is valid
+    // int socket_test = 0;
+    // if (fcntl(PortFD, F_GETFL, &socket_test) < 0) {
+    //     LOGF_ERROR("Socket test failed: %s", strerror(errno));
+    //     return false;
+    // }
+    
+    // Wait a bit for connection to be established
+    // std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     return true;
 }
@@ -177,8 +197,13 @@ IPState AndrFocuser::MoveRelFocuser(FocusDirection dir, uint32_t ticks)
     // TODO: Actual code to move the focuser.
     LOGF_INFO("MoveRelFocuser: %d %d", dir, ticks);
 
-    char q[32];
-    bool result = SendCommand("A test command..", q, sizeof(q));
+    char command[32];
+    sprintf(command, "MoveRel;Dir:%d;Ticks:%d", dir, ticks);
+
+    char response[256];
+    bool result = SendCommand(command, response, sizeof(response));
+
+    LOGF_INFO("Response: %s", response);
 
     if (result)
     {
@@ -198,7 +223,7 @@ bool AndrFocuser::AbortFocuser()
     return true;
 }
 
-bool AndrFocuser::SendCommand(const char *cmd, char *res, int reslen)
+bool AndrFocuser::SendCommand(const char *request, char *response, int responseLen)
 {
     int fd = tcpConnection->getPortFD();
     if (fd < 0)
@@ -208,22 +233,22 @@ bool AndrFocuser::SendCommand(const char *cmd, char *res, int reslen)
     }
 
     // Write and read operations are identical to serial
-    int nBytesWritten = write(fd, cmd, strlen(cmd));
+    int nBytesWritten = write(fd, request, strlen(request));
     if (nBytesWritten < 0)
     {
         LOGF_ERROR("Write error: %s", strerror(errno));
         return false;
     }
 
-    if (res && reslen > 0)
+    if (response && responseLen > 0)
     {
-        int nBytesRead = read(fd, res, reslen - 1);
+        int nBytesRead = read(fd, response, responseLen - 1);
         if (nBytesRead < 0)
         {
             LOGF_ERROR("Read error: %s", strerror(errno));
             return false;
         }
-        res[nBytesRead] = '\0';
+        response[nBytesRead] = '\0';
     }
 
     return true;
