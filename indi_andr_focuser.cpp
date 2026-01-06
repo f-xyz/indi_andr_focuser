@@ -26,44 +26,11 @@ const char *AndrFocuser::getDefaultName()
     return "Andr Focuser";
 }
 
-bool AndrFocuser::initProperties()
-{
-    INDI::Focuser::initProperties();
-    addAuxControls();
-
-    return true;
-}
-
-bool AndrFocuser::updateProperties()
-{
-    INDI::Focuser::updateProperties();
-
-    if (isConnected())
-    {
-        // TODO: Call define* for any custom properties only visible when connected.
-    }
-    else
-    {
-        // TODO: Call deleteProperty for any custom properties only visible when connected.
-    }
-
-    return true;
-}
-
 bool AndrFocuser::Handshake()
 {
-    if (isSimulation())
-    {
-        LOGF_INFO("Connected successfuly to simulated %s.", getDeviceName());
-        return true;
-    }
-
-    // NOTE: PortFD is set by the base class.
-
-    LOG_INFO("Handshake with AndrFocuser server...");
-
-    LOGF_INFO("Port this.FD: %d", this->PortFD);
-    LOGF_INFO("Port tcpConnection.FD: %d", tcpConnection->getPortFD());
+    LOG_INFO("Handshake with AndrFocuser server:");
+    LOGF_INFO("  Port this.FD: %d", this->PortFD);
+    LOGF_INFO("  Port tcpConnection.FD: %d", tcpConnection->getPortFD());
 
     if (PortFD == -1)
     {
@@ -97,7 +64,6 @@ bool AndrFocuser::SendCommand(const char *request, char *response, int responseL
     if (fd < 0)
     {
         LOG_ERROR("TCP socket not open");
-        // tcpConnection->Connect();
         return false;
     }
 
