@@ -10,12 +10,7 @@ static std::unique_ptr<AndrFocuser> andrFocuser(new AndrFocuser());
 AndrFocuser::AndrFocuser()
 {
     setVersion(CDRIVER_VERSION_MAJOR, CDRIVER_VERSION_MINOR);
-
-    // And here we tell the base class about our focuser's capabilities.
-    // Values: FOCUSER_CAN_ABS_MOVE | FOCUSER_CAN_REL_MOVE | FOCUSER_CAN_ABORT
     SetCapability(FOCUSER_CAN_REL_MOVE);
-
-    // Set connection up
     setSupportedConnections(CONNECTION_TCP);
     
     tcpConnection = new Connection::TCP(this);
@@ -34,7 +29,7 @@ const char *AndrFocuser::getDefaultName()
 
 bool AndrFocuser::initProperties()
 {
-    // initialize the parent's properties first
+    // Initialize the parent's properties first
     INDI::Focuser::initProperties();
 
     // TODO: Add any custom properties you need here.
@@ -42,13 +37,6 @@ bool AndrFocuser::initProperties()
     addAuxControls();
 
     return true;
-}
-
-void AndrFocuser::ISGetProperties(const char *dev)
-{
-    INDI::Focuser::ISGetProperties(dev);
-
-    // TODO: Call define* for any custom properties.
 }
 
 bool AndrFocuser::updateProperties()
@@ -67,58 +55,6 @@ bool AndrFocuser::updateProperties()
     return true;
 }
 
-bool AndrFocuser::ISNewNumber(const char *dev, const char *name, double values[], char *names[], int n)
-{
-    // Make sure it is for us.
-    if (dev != nullptr && strcmp(dev, getDeviceName()) == 0)
-    {
-        // TODO: Check to see if this is for any of my custom Number properties.
-    }
-
-    // Nobody has claimed this, so let the parent handle it
-    return INDI::Focuser::ISNewNumber(dev, name, values, names, n);
-}
-
-bool AndrFocuser::ISNewSwitch(const char *dev, const char *name, ISState *states, char *names[], int n)
-{
-    // Make sure it is for us.
-    if (dev != nullptr && strcmp(dev, getDeviceName()) == 0)
-    {
-        // TODO: Check to see if this is for any of my custom Switch properties.
-    }
-
-    // Nobody has claimed this, so let the parent handle it
-    return INDI::Focuser::ISNewSwitch(dev, name, states, names, n);
-}
-
-bool AndrFocuser::ISNewText(const char *dev, const char *name, char *texts[], char *names[], int n)
-{
-    // Make sure it is for us.
-    if (dev != nullptr && strcmp(dev, getDeviceName()) == 0)
-    {
-        // TODO: Check to see if this is for any of my custom Text properties.
-    }
-
-    // Nobody has claimed this, so let the parent handle it
-    return INDI::Focuser::ISNewText(dev, name, texts, names, n);
-}
-
-bool AndrFocuser::ISSnoopDevice(XMLEle *root)
-{
-    // TODO: Check to see if this is for any of my custom Snoops. Fo shizzle.
-
-    return INDI::Focuser::ISSnoopDevice(root);
-}
-
-bool AndrFocuser::saveConfigItems(FILE *fp)
-{
-    INDI::Focuser::saveConfigItems(fp);
-
-    // TODO: Call IUSaveConfig* for any custom properties I want to save.
-
-    return true;
-}
-
 bool AndrFocuser::Handshake()
 {
     if (isSimulation())
@@ -128,9 +64,6 @@ bool AndrFocuser::Handshake()
     }
 
     // NOTE: PortFD is set by the base class.
-
-    // TODO: Any initial communciation needed with our focuser, we have an active
-    // connection.
 
     LOG_INFO("Handshake with AndrFocuser server...");
     

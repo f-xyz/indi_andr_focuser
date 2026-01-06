@@ -1,3 +1,5 @@
+Focuser device driver for INDI.org.
+
 # Environment
 
 ```sh
@@ -17,6 +19,8 @@ sudo apt install libindi-dev libnova-dev libz-dev libgsl-dev
 # Installing
 
 ```sh
+sudo ./install.sh
+# or:
 cd build
 sudo make install
 ```
