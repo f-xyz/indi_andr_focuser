@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const net = require('net');
 const Gpio = require('onoff').Gpio;
 const { logAddress } = require('./utils');
@@ -39,22 +41,24 @@ const server = net.createServer((socket) => {
     const direction = parseInt(groups[2], 10);
     const ticks = parseInt(groups[3], 10);
 
-    console.log('    command:', command);
-    console.log('    direction:', direction);
-    console.log('    ticks:', ticks);
+    console.log([
+      `Command: ${command}`,
+      `Direction: ${direction}`,
+      `Ticks: ${ticks}`
+    ].join('; '));
 
     if (direction > 0) {
       motorCw.writeSync(1);
       setTimeout(() => {
         motorCw.writeSync(0);
         socket.write(`OK: ${request}`);
-      }, ticks * 10);
+      }, ticks);
     } else {
       motorCcw.writeSync(1);
       setTimeout(() => {
         motorCcw.writeSync(0);
         socket.write(`OK: ${request}`);
-      }, ticks * 10);
+      }, ticks);
     }
   });
 
