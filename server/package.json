@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@types/onoff": "^3.2.1",
-    "onoff": "^6.0.3"
+    "@types/rpio": "^2.4.6",
+    "onoff": "^6.0.3",
+    "rpio": "^2.4.2"
   }
 }
