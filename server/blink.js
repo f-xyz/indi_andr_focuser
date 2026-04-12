@@ -1,5 +1,5 @@
 const Gpio = require('onoff').Gpio;
-const powerLed = new Gpio(534, 'out'); // GPIO 22 Violet
+const powerLed = new Gpio(538, "out"); // GPIO 26 Green
 const blinkInterval = setInterval(blinkLed, 500);
 setTimeout(endBlink, 1e4);
 
