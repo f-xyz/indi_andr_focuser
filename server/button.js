@@ -9,11 +9,11 @@ const Gpio = require("onoff").Gpio;
   const motorEnabled = new Gpio(534, "out"); // GPIO 22 Violet
   const buttonCw = new Gpio(514, "in", "both"); // GPIO 2 Orange
   const buttonCcw = new Gpio(515, "in", "both"); // GPIO 3 Orange
-  const STEPS_PER_ROTATION = 1600; // 1/8 of step
+  const STEPS_PER_ROTATION = 1600;
   const FREQUENCY = 200;
 
   powerLed.writeSync(1);
-  motorEnabled.writeSync(0);
+  motorEnabled.writeSync(1);
   motorStep.writeSync(0);
 
   ////////////////////////////////////////
