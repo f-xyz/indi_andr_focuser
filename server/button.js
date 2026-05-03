@@ -19,8 +19,6 @@ const Gpio = require("onoff").Gpio;
   ////////////////////////////////////////
 
   class StepperMotor {
-    STEPS_PER_ROTATION = 1600; // 1/8 of step
-
     direction = true;
     isRunning = false;
     timeout = null;
@@ -38,11 +36,13 @@ const Gpio = require("onoff").Gpio;
       this.direction = direction;
       this.isRunning = true;
 
+      motorEnabled.writeSync(0);
       motorDir.writeSync(direction);
       this._rotate(frequency);
     }
 
     stop() {
+      motorEnabled.writeSync(1);
       clearTimeout(this.timeout);
       this.isRunning = false;
     }

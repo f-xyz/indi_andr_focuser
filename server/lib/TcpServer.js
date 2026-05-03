@@ -1,5 +1,6 @@
 const net = require('net');
-const { logAddress } = require("./utils");
+const { logAddress } = require("../utils");
+
 const HOST = '0.0.0.0';
 const PORT = 12345;
 
