@@ -24,3 +24,11 @@ sudo ./install.sh
 cd build
 sudo make install
 ```
+
+# Misc.
+
+Testing Serial over USB connection:
+```sh
+sudo picocom -b 115200 --echo /dev/ttyACM0
+# Command: MoveRel;Dir:0;Ticks:1000
+```

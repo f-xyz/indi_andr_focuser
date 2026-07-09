@@ -1,0 +1,23 @@
+{
+  "name": "indi_andr_focuser_server",
+  "version": "1.0.0",
+  "description": "",
+  "license": "MIT",
+  "author": "f-xyz (https://github.com/f-xyz)",
+  "type": "commonjs",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "@serialport/parser-regex": "^13.0.0",
+    "@types/onoff": "^3.2.1",
+    "@types/rpio": "^2.4.6",
+    "@types/serialport": "^8.0.5",
+    "onoff": "^6.0.3",
+    "rpio": "^2.4.2",
+    "serialport": "^13.0.0",
+    "typescript": "^6.0.3"
+  }
+}
