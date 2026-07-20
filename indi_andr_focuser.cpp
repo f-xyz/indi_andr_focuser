@@ -1,10 +1,11 @@
 #include "indi_andr_focuser.h"
-#include <cstring>
 #include "config.h"
+#include "indifocuser.h"
 #include "libindi/connectionplugins/connectionserial.h"
-#include "libindi/indicom.h"
+#include <cstring>
 
 static std::unique_ptr<AndrFocuser> andrFocuser(new AndrFocuser());
+const char *AndrFocuser::getDefaultName() { return "Andr Focuser"; }
 
 AndrFocuser::AndrFocuser() {
   setVersion(CDRIVER_VERSION_MAJOR, CDRIVER_VERSION_MINOR);
@@ -18,39 +19,36 @@ AndrFocuser::AndrFocuser() {
   registerConnection(serialConnection);
 }
 
-const char* AndrFocuser::getDefaultName() { return "Andr Focuser"; }
-
 bool AndrFocuser::Handshake() {
   LOG_INFO("Handshake with AndrFocuser server:");
   LOGF_INFO(" * Port this.FD: %d", this->PortFD);
   LOGF_INFO(" * Port serialConnection.FD: %d", serialConnection->getPortFD());
 
   if (PortFD == -1) {
-    LOG_ERROR("Invalid port file descriptor during handshake.");
+    LOG_ERROR("Handshake failed: invalid port file descriptor");
     return false;
   }
 
-  LOGF_INFO("Connected successfuly to %s.", getDeviceName());
+  LOGF_INFO("Handshake successfull with the %s.", getDeviceName());
 
   return true;
 }
 
 IPState AndrFocuser::MoveRelFocuser(FocusDirection dir, uint32_t ticks) {
   LOGF_INFO("MoveRelFocuser: %d %d", dir, ticks);
-
-  char command[32];
-  sprintf(command, "MoveRel;Dir:%d;Ticks:%d\n", dir, ticks);
+  
+  char request[32];
+  sprintf(request, "MoveRel;Dir:%d;Ticks:%d\n", dir, ticks);
+  LOGF_INFO("Request: %s", request);
 
   char response[256];
-  bool result = SendCommand(command, response, sizeof(response));
-
+  bool result = SendCommand(request, response, sizeof(response));
   LOGF_INFO("Response: %s", response);
 
   return result ? IPS_OK : IPS_ALERT;
 }
 
-bool AndrFocuser::SendCommand(const char* request, char* response,
-                              int responseLen) {
+bool AndrFocuser::SendCommand(const char *request, char *response, int responseLen) {
   int fd = PortFD;
   if (fd < 0) {
     LOG_ERROR("Device port not open");
