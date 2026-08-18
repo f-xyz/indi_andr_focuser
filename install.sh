@@ -1,2 +1,3 @@
-cd build
-sudo make install
+#!/usr/bin/bash
+
+cd build && sudo make install
